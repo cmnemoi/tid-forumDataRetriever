@@ -16,11 +16,10 @@
 
 // PARAMETERS
 var startCountdown = 3000;
-var nPages = 1;
+var nPages = undefined;
+var mainDisplay = 'askToShowInterface';
 
 function startFDR(v1) {
-    var nPages = v1; // gets set in 'check' function if undefined 
-
     var currId = 0;
     var ids = [];
     var threads = "";
@@ -31,6 +30,7 @@ function startFDR(v1) {
     var counter = 0;
 
     var e = document.getElementById("tid_forum_right");
+    nPages = v1;
 
     function check() {
         if (nPages == undefined) nPages = parseInt(document.getElementById("fdr-nPages").value);
@@ -38,6 +38,7 @@ function startFDR(v1) {
         if (_tid.forum.urlLeft.indexOf("?p=") == -1) _tid.forum.loadLeft(_tid.forum.urlLeft+"?p=1");
 
         console.log("[ForumDataRetriever] Start : " + nPages);
+        updateStatus("Pages fetched : " + pageCount + " (Max : " + nPages + ")");
 
         threads = document.getElementsByClassName("tid_thread tid_threadLink");
         ids = [];
@@ -113,9 +114,11 @@ function startFDR(v1) {
                     if (nextTopicPage !== undefined && nextTopicPage.toString().split("=")[1] !== undefined) {
                         pageCount++;
                         nextTopicPage = nextTopicPage.toString().split("=")[1].split("|")[0];
-                        counter++;console.log(counter);
+                        updateStatus("Pages fetched : " + pageCount + " (Max : " + nPages + ")");
+
                         if (nPages == pageCount) {
                             console.log(data+'\n\t}\n]}');
+                            updateStatus("Pages fetched : " + pageCount + ". Result is logged into console.");
                             return;
                         }
                         data += '\n\t},\n\t{\n\t';
@@ -136,6 +139,7 @@ function startFDR(v1) {
                     else {
                         data += '\n\t}\n]}';
                         console.log(data);
+                        updateStatus("Pages fetched : " + pageCount + ". Result is logged into console.");
                     }
                     return;
                 };
@@ -175,9 +179,23 @@ function startFDR(v1) {
     check();
 }
 
+var fdrMainElement = undefined;
+
+function switchMainDisplayToStatus() {
+    fdrMainElement = document.getElementById("fdr-main");
+    fdrMainElement.innerHTML = "Pages fetched : 0";
+    mainDisplay = "status";
+}
+
+function updateStatus(msg) {
+    if (mainDisplay != "status" || fdrMainElement == undefined) return;
+    fdrMainElement.innerHTML = msg;
+}
+
 window.onload = function () {
     document.addEventListener('click', function (e) {
         if (e.target == document.getElementById("fdr-go")) {
+            switchMainDisplayToStatus();
             startFDR();
         }
         else if (e.target == document.getElementById("fdr-a") && document.getElementById("fdr-interface") == undefined) {
@@ -211,7 +229,7 @@ window.onload = function () {
 
     var template = document.createElement('template');
     template.innerHTML = `
-    <p style="margin:auto;text-align:center;"><a href="javascrip:void(0)" id="fdr-a">Show ForumDataRetriever Interface</a> </p>`.trim();
+    <p id="fdr-main" style="margin:auto;text-align:center;"><a href="javascrip:void(0)" id="fdr-a">Show ForumDataRetriever Interface</a> </p>`.trim();
     var node = template.content.firstChild;
     var e = document.getElementById("content");
     e.insertBefore(node,e.children[0]);
