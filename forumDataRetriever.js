@@ -138,7 +138,7 @@ function startFDR(nPages) {
                     else {
                         jsonData += '\n\t}\n]}';
                         console.log(jsonData);
-                        updateStatus("Pages fetched : " + pageCount + ". Result is logged into console.");
+                        updateStatus("Pages fetched : " + nPageThreadsScanned + ". Result is logged into console.");
                     }
                     return;
                 };
