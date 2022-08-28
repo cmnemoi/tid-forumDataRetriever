@@ -181,12 +181,12 @@ window.onload = function () {
             startFDR();
         }
         else if (e.target == document.getElementById("fdr-a") && document.getElementById("fdr-interface") == undefined) {
-            addElement();
+            addFDRInterface();
         }
         ;
     });
 
-    function addElement() {
+    function addFDRInterface() {
         var template = document.createElement('template');
         template.innerHTML = `
         <div class="tid_mainBar" id="fdr-interface">
