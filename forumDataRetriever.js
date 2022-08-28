@@ -37,7 +37,6 @@ function startFDR(v1) {
         if (isNaN(nPages)) { console.log("[ForumDataRetriever] nPages is NaN."); return; }
         if (_tid.forum.urlLeft.indexOf("?p=") == -1) _tid.forum.loadLeft(_tid.forum.urlLeft+"?p=1");
 
-        console.log("[ForumDataRetriever] Start : " + nPages);
         updateStatus("Pages fetched : " + pageCount + " (Max : " + nPages + ")");
 
         threads = document.getElementsByClassName("tid_thread tid_threadLink");
