@@ -39,24 +39,26 @@ function startFDR(nPages) {
 
         threadElements = document.getElementsByClassName("tid_thread tid_threadLink");
         threadIDs = [];
-
+        threadPos = 0;
+        forumRPageNumber = 1;
         for (var i = 0; i < threadElements.length; i++) {
             var attr = threadElements[i].getAttribute("id");
             threadIDs.push(attr.split("_")[2]);
         }
-        threadPos = 0;
-        forumRPageNumber = 1;
 
-        var cbc2 = function(mutList, observer) {
+        var obs2 = new MutationObserver(function (mutList, observer) {
             for(var mutation of mutList) {
                 if (mutation.type == 'childList') {
-                    var node = mutation.removedNodes[0];
-                    if (node !== undefined && node.className === "tid_loading") {
+                    var removedNode = mutation.removedNodes[0];
+                    if (removedNode !== undefined && removedNode.className === "tid_loading") {
                         observer.disconnect();
                         check2();
-                    }}}}
-        var obs2 = new MutationObserver(cbc2);
+                    }
+                }
+            }
+        });
         obs2.observe(forumRElement, { childList: true });
+
         _tid.forum.loadRight("thread/"+threadIDs[threadPos]+"?p=1", { side : "R"});
     }
 
