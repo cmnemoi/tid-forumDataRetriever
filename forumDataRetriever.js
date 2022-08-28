@@ -62,30 +62,32 @@ function startFDR(nPages) {
         _tid.forum.loadRight("thread/"+threadIDs[threadPos]+"?p=1", { side : "R"});
     }
 
-    // Cycle through threads
+    // Read thread headers, then start reading threads posts
     function check2() {
-        var topicName = document.querySelectorAll("#tid_forum_right .tid_title")[0].innerHTML.trim();
         var commentCount = 0;
+        var topicName = document.querySelectorAll("#tid_forum_right .tid_title")[0].innerHTML.trim();
         topicName = topicName.replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/\n/g,'').replace(/\t/g,'');
+
         jsonData += '"name":"'+topicName+'",\n\t';
         jsonData += '"id":'+threadIDs[threadPos]+',\n\t';
-
-        // Cycle through posts
+        jsonData += '"pages":'+forumRPageNumber+',\n\t';
+        jsonData += '"commentsCount":'+commentCount+',\n\t';
         jsonData += '"comments":[';
+        // Read thread posts
         function check3() {
             var pagePosts = document.getElementsByClassName("tid_post");
 
-            var nextPage = document.querySelectorAll("#tid_forum_right .tid_mainBar .tid_next a")[0];
-            if (nextPage !== undefined) nextPage = nextPage.toString().split("=")[2];
+            var e = document.querySelectorAll("#tid_forum_right .tid_mainBar .tid_next a")[0];
+            var nextCommentsPage = (e === undefined) ? undefined : e.toString().split("=")[2];
 
             for (var i = 0; i < pagePosts.length; i++) {
                 var commentID = parseInt(pagePosts[i].id.substr(14));
-                if (document.querySelectorAll("#tid_forumPost_"+commentID+" .tid_name a")[0] === undefined) {
+                if (document.querySelector("#tid_forumPost_"+commentID+" .tid_name a") === undefined) {
                     continue;
                 }
                 var postScanDate = Date.now();
-                var postAuthor = document.querySelectorAll("#tid_forumPost_"+commentID+" .tid_name a")[0].toString().split("/")[5];
-                var postDate = document.querySelectorAll("#tid_forumPost_"+commentID+" .tid_date")[0].innerHTML;
+                var postAuthor = document.querySelector("#tid_forumPost_"+commentID+" .tid_name a").toString().split("/")[5];
+                var postDate = document.querySelector("#tid_forumPost_"+commentID+" .tid_date").innerHTML;
                 var res = document.querySelectorAll("#tid_forumPost_"+commentID+" .tid_editorContent");
                 var postContent = res[0].innerHTML;
                 var postWarning = res[1] == undefined ? undefined : res[1].innerHTML;
@@ -104,72 +106,83 @@ function startFDR(nPages) {
                 jsonData += "}";
             }
 
-            if (isNaN(nextPage)) {
-                jsonData += '],\n\t"pages":'+forumRPageNumber+',';
-                jsonData += '\n\t"commentsCount":'+commentCount;
+
+            if (isNaN(nextCommentsPage)) {
+                jsonData += ']';
                 forumRPageNumber = 1;
-                if (++threadPos == threadIDs.length) {
-                    var nextTopicPage = document.querySelectorAll("#tid_forum_left .tid_actionBar .tid_next a")[0];
-                    if (nextTopicPage !== undefined && nextTopicPage.toString().split("=")[1] !== undefined) {
-                        nPageThreadsScanned++;
-                        nextTopicPage = nextTopicPage.toString().split("=")[1].split("|")[0];
+
+                // if on last thread of thread page
+                if (threadPos+1 == threadIDs.length) {
+                    nPageThreadsScanned++;
+
+                    function reachedEnd() {
+                        console.log(jsonData+'\n\t}\n]}');
+                        updateStatus("Pages fetched : " + nPageThreadsScanned + ". Result is logged into console.");
+                    }
+
+                    if (maxPages == nPageThreadsScanned) {
+                        reachedEnd();
+                        return;
+                    }
+
+                    // if next thread page exists
+                    var e = document.querySelectorAll("#tid_forum_left .tid_actionBar .tid_next a")[0];
+                    if (e !== undefined && e.toString().split("=")[1] !== undefined) {
+                        var nextThreadsPage = e.toString().split("=")[1].split("|")[0];
+                        if (maxPages == nPageThreadsScanned) 
+
                         updateStatus("Pages fetched : " + nPageThreadsScanned + " (Max : " + maxPages + ")");
 
-                        if (maxPages == nPageThreadsScanned) {
-                            console.log(jsonData+'\n\t}\n]}');
-                            updateStatus("Pages fetched : " + nPageThreadsScanned + ". Result is logged into console.");
-                            return;
-                        }
                         jsonData += '\n\t},\n\t{\n\t';
 
-                        var e2 = document.getElementById("tid_forum_left");
-                        var cbc1 = function(mutList, observer) {
+                        // scanThreads starts when next page of threads loaded
+                        new MutationObserver(function(mutList, observer) {
                             for(var mutation of mutList) {
                                 if (mutation.type == 'childList') {
                                     var node = mutation.removedNodes[0];
                                     if (node !== undefined && node.className === "tid_loading") {
                                         observer.disconnect();
                                         scanThreads();
-                                    }}}}
-                        var obs1 = new MutationObserver(cbc1);
-                        obs1.observe(e2, { childList: true });
-                        _tid.forum.loadLeft(_tid.forum.urlLeft.split("?")[0]+"?p="+nextTopicPage);
-                    }
-                    else {
-                        jsonData += '\n\t}\n]}';
-                        console.log(jsonData);
-                        updateStatus("Pages fetched : " + nPageThreadsScanned + ". Result is logged into console.");
-                    }
-                    return;
-                };
-                jsonData += '\n\t},\n\t{\n\t';
+                                    }
+                                }
+                            }
+                        }).observe(document.getElementById("tid_forum_left"), { childList: true });
 
-                var cbc2 = function(mutList, observer) {
-                    for(var mutation of mutList) {
-                        if (mutation.type == 'childList') {
-                            var node = mutation.removedNodes[0];
-                            if (node !== undefined && node.className === "tid_loading") {
-                                observer.disconnect();
-                                check2();
-                            }}}}
-                var obs2 = new MutationObserver(cbc2);
-                obs2.observe(forumRElement, { childList: true });
-                _tid.forum.loadRight("thread/"+threadIDs[threadPos]+"?p=1");
-            }
-            else {
+                        _tid.forum.loadLeft(_tid.forum.urlLeft.split("?")[0]+"?p="+nextThreadsPage);
+                    }
+                } else {
+                    // check2 starts when next thread and its first page loaded
+                    new MutationObserver(function(mutList, observer) {
+                        for(var mutation of mutList) {
+                            if (mutation.type == 'childList') {
+                                var node = mutation.removedNodes[0];
+                                if (node !== undefined && node.className === "tid_loading") {
+                                    observer.disconnect();
+                                    check2();
+                                }
+                            }
+                        }
+                    }).observe(forumRElement, { childList: true });
+
+                    jsonData += '\n\t},\n\t{\n\t';
+                    _tid.forum.loadRight("thread/"+threadIDs[++threadPos]+"?p=1");
+                }
+            } else {
                 forumRPageNumber++;
 
-                var cbc3 = function(mutList, observer) {
+                // check3 starts when next page of comments loaded
+                new MutationObserver(function(mutList, observer) {
                     for(var mutation of mutList) {
                         if (mutation.type == 'childList') {
                             var node = mutation.removedNodes[0];
                             if (node !== undefined && node.className === "tid_loading") {
                                 observer.disconnect();
                                 check3();
-                            }}}}
-                var obs3 = new MutationObserver(cbc3);
-                obs3.observe(forumRElement, { childList: true });
-                _tid.forum.loadRight("thread/"+threadIDs[threadPos]+"?p="+nextPage);
+                            }
+                        }
+                    }
+                }).observe(forumRElement, { childList: true });
+                _tid.forum.loadRight("thread/"+threadIDs[threadPos]+"?p="+nextCommentsPage);
             }
         }
         check3();
