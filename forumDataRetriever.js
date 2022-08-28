@@ -29,6 +29,7 @@ function startFDR(nPages) {
     var forumRElement = document.getElementById("tid_forum_right");
     maxPages = nPages;
 
+    // Reads a page of threads
     function scanThreads() {
         if (maxPages == undefined) maxPages = parseInt(document.getElementById("fdr-maxPages").value);
         if (isNaN(maxPages)) { console.log("[ForumDataRetriever] maxPages is NaN."); return; }
@@ -52,7 +53,7 @@ function startFDR(nPages) {
                     var removedNode = mutation.removedNodes[0];
                     if (removedNode !== undefined && removedNode.className === "tid_loading") {
                         observer.disconnect();
-                        check2();
+                        scanThread();
                     }
                 }
             }
@@ -62,8 +63,8 @@ function startFDR(nPages) {
         _tid.forum.loadRight("thread/"+threadIDs[threadPos]+"?p=1", { side : "R"});
     }
 
-    // Read thread headers, then start reading threads posts
-    function check2() {
+    // Reads current loaded thread header, then reads all comments in thread
+    function scanThread() {
         var commentCount = 0;
         var topicName = document.querySelectorAll("#tid_forum_right .tid_title")[0].innerHTML.trim();
         topicName = topicName.replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/\n/g,'').replace(/\t/g,'');
@@ -73,8 +74,8 @@ function startFDR(nPages) {
         jsonData += '"pages":'+forumRPageNumber+',\n\t';
         jsonData += '"commentsCount":'+commentCount+',\n\t';
         jsonData += '"comments":[';
-        // Read thread posts
-        function check3() {
+        // Reads thread comments
+        function scanThreadComments() {
             var pagePosts = document.getElementsByClassName("tid_post");
 
             var e = document.querySelectorAll("#tid_forum_right .tid_mainBar .tid_next a")[0];
@@ -151,14 +152,14 @@ function startFDR(nPages) {
                         _tid.forum.loadLeft(_tid.forum.urlLeft.split("?")[0]+"?p="+nextThreadsPage);
                     }
                 } else {
-                    // check2 starts when next thread and its first page loaded
+                    // scanThread starts when next thread loads
                     new MutationObserver(function(mutList, observer) {
                         for(var mutation of mutList) {
                             if (mutation.type == 'childList') {
                                 var node = mutation.removedNodes[0];
                                 if (node !== undefined && node.className === "tid_loading") {
                                     observer.disconnect();
-                                    check2();
+                                    scanThread();
                                 }
                             }
                         }
@@ -170,14 +171,14 @@ function startFDR(nPages) {
             } else {
                 forumRPageNumber++;
 
-                // check3 starts when next page of comments loaded
+                // scanThreadComments starts when next page of comments loaded
                 new MutationObserver(function(mutList, observer) {
                     for(var mutation of mutList) {
                         if (mutation.type == 'childList') {
                             var node = mutation.removedNodes[0];
                             if (node !== undefined && node.className === "tid_loading") {
                                 observer.disconnect();
-                                check3();
+                                scanThreadComments();
                             }
                         }
                     }
@@ -185,7 +186,7 @@ function startFDR(nPages) {
                 _tid.forum.loadRight("thread/"+threadIDs[threadPos]+"?p="+nextCommentsPage);
             }
         }
-        check3();
+        scanThreadComments();
     }
 
     scanThreads();
