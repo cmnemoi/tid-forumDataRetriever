@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         ForumDataRetriever
-// @version      2.2.0
+// @version      3.0.0
 // @description  Retrieve twinoid forums data into JSON Format
 // @author       Sanart
 // @updateURL   https://raw.githubusercontent.com/Sanart99/tid-forumDataRetriever/master/forumDataRetriever.js
@@ -15,8 +15,8 @@
 
 
 // PARAMETERS
-var startCountdown = 5000;
-var nPages = 250;
+var startCountdown = 3000;
+var nPages = 1;
 
 window.onload = function () {
     var currId = 0;
@@ -80,8 +80,12 @@ window.onload = function () {
                 var postScanDate = Date.now();
                 var postAuthor = document.querySelectorAll("#tid_forumPost_"+commentID+" .tid_name a")[0].toString().split("/")[5];
                 var postDate = document.querySelectorAll("#tid_forumPost_"+commentID+" .tid_date")[0].innerHTML;
-                var postContent = document.querySelectorAll("#tid_forumPost_"+commentID+" .tid_parsed")[1].innerHTML;
+                var res = document.querySelectorAll("#tid_forumPost_"+commentID+" .tid_editorContent");
+                var postContent = res[0].innerHTML;
+                var postWarning = res[1] == undefined ? undefined : res[1].innerHTML;
                 postContent = postContent.replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/\u{2028}|\u{2029}/gu, '').replace(/\r\n/g,'<br />').replace(/\n/g,'\\n');
+                if (postWarning != undefined)
+                    postWarning = postWarning.replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/\u{2028}|\u{2029}/gu, '').replace(/\r\n/g,'<br />').replace(/\n/g,'\\n'); // replaces copypasted
                 commentCount++;
 
                 data += commentCount == 1 ? '\n\t\t{\n\t\t\t' : ',\n\t\t{\n\t\t\t';
@@ -89,7 +93,8 @@ window.onload = function () {
                 data += '"authorID":'+postAuthor+',\n\t\t\t';
                 data += '"id":'+commentID+',\n\t\t\t';
                 data += '"date":"'+postDate+'",\n\t\t\t';
-                data += '"content":"'+postContent+'"\n\t\t';
+                data += '"content":"'+postContent+'",\n\t\t\t';
+                data += '"contentWarning":' + (postWarning == undefined ? 'null' : '"'+postWarning+'"') + '\n\t\t';
                 data += "}";
             }
 
