@@ -19,12 +19,12 @@ var mainDisplay = 'askToShowInterface';
 function startFDR(nPages) {
     var threadElements = undefined;
     var threadIDs = [];
-    var currID = 0;
+    var threadPos = 0;
 
     var jsonData = '{\n"topics": [{\n\t';
 
-    var pageNumber = 1;
-    var pageCount = 0;
+    var forumRPageNumber = 1;
+    var nPageThreadsScanned = 0;
 
     var forumRElement = document.getElementById("tid_forum_right");
     maxPages = nPages;
@@ -32,9 +32,10 @@ function startFDR(nPages) {
     function scanThreads() {
         if (maxPages == undefined) maxPages = parseInt(document.getElementById("fdr-maxPages").value);
         if (isNaN(maxPages)) { console.log("[ForumDataRetriever] maxPages is NaN."); return; }
+        
         if (_tid.forum.urlLeft.indexOf("?p=") == -1) _tid.forum.loadLeft(_tid.forum.urlLeft+"?p=1");
 
-        updateStatus("Pages fetched : " + pageCount + " (Max : " + maxPages + ")");
+        updateStatus("Pages fetched : " + nPageThreadsScanned + " (Max : " + maxPages + ")");
 
         threadElements = document.getElementsByClassName("tid_thread tid_threadLink");
         threadIDs = [];
@@ -43,8 +44,8 @@ function startFDR(nPages) {
             var attr = threadElements[i].getAttribute("id");
             threadIDs.push(attr.split("_")[2]);
         }
-        currID = 0;
-        pageNumber = 1;
+        threadPos = 0;
+        forumRPageNumber = 1;
 
         var cbc2 = function(mutList, observer) {
             for(var mutation of mutList) {
@@ -56,7 +57,7 @@ function startFDR(nPages) {
                     }}}}
         var obs2 = new MutationObserver(cbc2);
         obs2.observe(forumRElement, { childList: true });
-        _tid.forum.loadRight("thread/"+threadIDs[currID]+"?p=1", { side : "R"});
+        _tid.forum.loadRight("thread/"+threadIDs[threadPos]+"?p=1", { side : "R"});
     }
 
     // Cycle through threads
@@ -65,7 +66,7 @@ function startFDR(nPages) {
         var commentCount = 0;
         topicName = topicName.replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/\n/g,'').replace(/\t/g,'');
         jsonData += '"name":"'+topicName+'",\n\t';
-        jsonData += '"id":'+threadIDs[currID]+',\n\t';
+        jsonData += '"id":'+threadIDs[threadPos]+',\n\t';
 
         // Cycle through posts
         jsonData += '"comments":[';
@@ -102,19 +103,19 @@ function startFDR(nPages) {
             }
 
             if (isNaN(nextPage)) {
-                jsonData += '],\n\t"pages":'+pageNumber+',';
+                jsonData += '],\n\t"pages":'+forumRPageNumber+',';
                 jsonData += '\n\t"commentsCount":'+commentCount;
-                pageNumber = 1;
-                if (++currID == threadIDs.length) {
+                forumRPageNumber = 1;
+                if (++threadPos == threadIDs.length) {
                     var nextTopicPage = document.querySelectorAll("#tid_forum_left .tid_actionBar .tid_next a")[0];
                     if (nextTopicPage !== undefined && nextTopicPage.toString().split("=")[1] !== undefined) {
-                        pageCount++;
+                        nPageThreadsScanned++;
                         nextTopicPage = nextTopicPage.toString().split("=")[1].split("|")[0];
-                        updateStatus("Pages fetched : " + pageCount + " (Max : " + maxPages + ")");
+                        updateStatus("Pages fetched : " + nPageThreadsScanned + " (Max : " + maxPages + ")");
 
-                        if (maxPages == pageCount) {
+                        if (maxPages == nPageThreadsScanned) {
                             console.log(jsonData+'\n\t}\n]}');
-                            updateStatus("Pages fetched : " + pageCount + ". Result is logged into console.");
+                            updateStatus("Pages fetched : " + nPageThreadsScanned + ". Result is logged into console.");
                             return;
                         }
                         jsonData += '\n\t},\n\t{\n\t';
@@ -151,10 +152,10 @@ function startFDR(nPages) {
                             }}}}
                 var obs2 = new MutationObserver(cbc2);
                 obs2.observe(forumRElement, { childList: true });
-                _tid.forum.loadRight("thread/"+threadIDs[currID]+"?p=1");
+                _tid.forum.loadRight("thread/"+threadIDs[threadPos]+"?p=1");
             }
             else {
-                pageNumber++;
+                forumRPageNumber++;
 
                 var cbc3 = function(mutList, observer) {
                     for(var mutation of mutList) {
@@ -166,7 +167,7 @@ function startFDR(nPages) {
                             }}}}
                 var obs3 = new MutationObserver(cbc3);
                 obs3.observe(forumRElement, { childList: true });
-                _tid.forum.loadRight("thread/"+threadIDs[currID]+"?p="+nextPage);
+                _tid.forum.loadRight("thread/"+threadIDs[threadPos]+"?p="+nextPage);
             }
         }
         check3();
