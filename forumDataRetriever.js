@@ -18,7 +18,9 @@
 var startCountdown = 3000;
 var nPages = 1;
 
-window.onload = function () {
+function startFDR(v1) {
+    var nPages = v1; // gets set in 'check' function if undefined 
+
     var currId = 0;
     var ids = [];
     var threads = "";
@@ -31,7 +33,11 @@ window.onload = function () {
     var e = document.getElementById("tid_forum_right");
 
     function check() {
+        if (nPages == undefined) nPages = parseInt(document.getElementById("fdr-nPages").value);
+        if (isNaN(nPages)) { console.log("[ForumDataRetriever] nPages is NaN."); return; }
         if (_tid.forum.urlLeft.indexOf("?p=") == -1) _tid.forum.loadLeft(_tid.forum.urlLeft+"?p=1");
+
+        console.log("[ForumDataRetriever] Start : " + nPages);
 
         threads = document.getElementsByClassName("tid_thread tid_threadLink");
         ids = [];
@@ -166,5 +172,47 @@ window.onload = function () {
         check3();
     }
 
-setTimeout(check, startCountdown);
+    check();
+}
+
+window.onload = function () {
+    document.addEventListener('click', function (e) {
+        if (e.target == document.getElementById("fdr-go")) {
+            startFDR();
+        }
+        else if (e.target == document.getElementById("fdr-a") && document.getElementById("fdr-interface") == undefined) {
+            addElement();
+        }
+        ;
+    });
+
+    function addElement() {
+        var template = document.createElement('template');
+        template.innerHTML = `
+        <div class="tid_mainBar" id="fdr-interface">
+            <div class="tid_stack tid_bg4">
+                <span class="tid_title">ForumDataRetriever</span>
+            </div>
+                
+            <div class="tid_actionBar tid_bg4">
+                <form>
+                    <label for="fdr-nPages" style="font-size:16px">Pages : </label>
+                    <input type="number" id="fdr-nPages" name="fdr-nPages" min="1" default="1" style="width:50px">
+                </form>
+                <div class="tid_buttonBar">
+                    <a href="javascript:void(0)" id="fdr-go">Go</a>
+                </div>
+            </div>
+        </div>`.trim();
+        var node = template.content.firstChild;
+        var e = document.querySelector("#tid_forum_left .tid_forumThreads");
+        e.insertBefore(node, e.children[1]);
+    }
+
+    var template = document.createElement('template');
+    template.innerHTML = `
+    <p style="margin:auto;text-align:center;"><a href="javascrip:void(0)" id="fdr-a">Show ForumDataRetriever Interface</a> </p>`.trim();
+    var node = template.content.firstChild;
+    var e = document.getElementById("content");
+    e.insertBefore(node,e.children[0]);
 }
