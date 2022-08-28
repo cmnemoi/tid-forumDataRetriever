@@ -225,7 +225,7 @@ window.onload = function () {
 
     var template = document.createElement('template');
     template.innerHTML = `
-    <p id="fdr-main" style="margin:auto;text-align:center;"><a href="javascrip:void(0)" id="fdr-a">Show ForumDataRetriever Interface</a> </p>`.trim();
+    <p id="fdr-main" style="margin:auto;text-align:center;"><a href="javascript:void(0)" id="fdr-a">Show ForumDataRetriever Interface</a> </p>`.trim();
     var node = template.content.firstChild;
     var e = document.getElementById("content");
     e.insertBefore(node,e.children[0]);
