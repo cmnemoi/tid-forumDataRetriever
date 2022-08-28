@@ -47,7 +47,7 @@ function startFDR(nPages) {
             threadIDs.push(attr.split("_")[2]);
         }
 
-        var obs2 = new MutationObserver(function (mutList, observer) {
+        new MutationObserver(function (mutList, observer) {
             for(var mutation of mutList) {
                 if (mutation.type == 'childList') {
                     var removedNode = mutation.removedNodes[0];
@@ -57,8 +57,7 @@ function startFDR(nPages) {
                     }
                 }
             }
-        });
-        obs2.observe(forumRElement, { childList: true });
+        }).observe(forumRElement, { childList: true });
 
         _tid.forum.loadRight("thread/"+threadIDs[threadPos]+"?p=1", { side : "R"});
     }
