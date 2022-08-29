@@ -77,6 +77,7 @@ function startFDR(nPages) {
         var thrElement = document.querySelector(".tid_thread.tid_selected");
         if (thrElement.classList.contains("tid_hidden")) addThrStates('hidden');
         if (document.querySelector("#tid_forum_right .tid_threadNotice.tid_lock") != undefined) addThrStates('locked');
+        if (document.querySelector("#tid_forum_right .tid_threadNotice.tid_niceLock") != undefined) addThrStates('niceLocked');
         if (document.querySelector("#tid_forum_right .tid_threadNotice.tid_adminAnnounce") != undefined) addThrStates('adminAnnounce');
         if (document.querySelector("#tid_forum_right .tid_threadNotice.tid_announce") != undefined) addThrStates('announce');
         
