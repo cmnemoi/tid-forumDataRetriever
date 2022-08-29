@@ -251,8 +251,34 @@ function deduceDate(displayedDate, loadTimestamp) {
             else diff = -((todayDay+7) - postDay);
 
             var postDate = new Date(loadDate);
-            postDate.setUTCDate((loadDate.getUTCDate()+diff));
-
+            postDate.setUTCDate(loadDate.getUTCDate()+diff);
+            var m = postDate.getUTCMonth()+1;
+            var sMonth = (m < 10) ? "0"+m : m;
+            sDate = postDate.getUTCFullYear()+"-"+sMonth+"-"+postDate.getUTCDate();
+            break;
+        case "Hier":
+            var postDate = new Date(loadDate);
+            postDate.setUTCDate(loadDate.getUTCDate()-1);
+            var m = postDate.getUTCMonth()+1;
+            var sMonth = (m < 10) ? "0"+m : m;
+            sDate = postDate.getUTCFullYear()+"-"+sMonth+"-"+postDate.getUTCDate();
+            break;
+        case "Aujourd'hui":
+            var postDate = new Date(loadDate);
+            var m = postDate.getUTCMonth()+1;
+            var sMonth = (m < 10) ? "0"+m : m;
+            sDate = postDate.getUTCFullYear()+"-"+sMonth+"-"+postDate.getUTCDate();
+            break;
+        case "Il":
+            var postDate = new Date(loadDate);
+            switch (spl.length) {
+                case 5: postDate.setUTCMinutes(postDate.getUTCMinutes()-parseInt(spl[3])); break;
+                case 7:
+                    postDate.setUTCHours(postDate.getUTCHours()-parseInt(spl[3]));
+                    postDate.setUTCMinutes(postDate.getUTCMinutes()-parseInt(spl[5]));
+                    break;
+                default: console.log("[ForumDataRetriever] displayedDate parsing failed: '" + spl[2] + "'"); return "???";
+            }
             var m = postDate.getUTCMonth()+1;
             var sMonth = (m < 10) ? "0"+m : m;
             sDate = postDate.getUTCFullYear()+"-"+sMonth+"-"+postDate.getUTCDate();
