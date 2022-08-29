@@ -72,7 +72,6 @@ function startFDR(nPages) {
         jsonData += '"name":"'+topicName+'",\n\t';
         jsonData += '"id":'+threadIDs[threadPos]+',\n\t';
         jsonData += '"pages":'+forumRPageNumber+',\n\t';
-        jsonData += '"commentsCount":'+commentCount+',\n\t';
         jsonData += '"comments":[';
         
         // Reads thread comments
@@ -111,7 +110,8 @@ function startFDR(nPages) {
 
 
             if (isNaN(nextCommentsPage)) {
-                jsonData += ']';
+                jsonData += '],\n\t';
+                jsonData += '"commentsCount":'+commentCount;
                 forumRPageNumber = 1;
 
                 // if on last thread of thread page
