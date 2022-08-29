@@ -64,6 +64,7 @@ function startFDR(nPages) {
 
     // Reads current loaded thread header, then reads all comments in thread
     function scanThread() {
+        var thrCommsPageLoadTimestamp = Date.now(); // threadCommentsPageLoadTimestamp
         var commentCount = 0;
         var topicName = document.querySelectorAll("#tid_forum_right .tid_title")[0].innerHTML.trim();
         topicName = topicName.replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/\n/g,'').replace(/\t/g,'');
@@ -73,6 +74,7 @@ function startFDR(nPages) {
         jsonData += '"pages":'+forumRPageNumber+',\n\t';
         jsonData += '"commentsCount":'+commentCount+',\n\t';
         jsonData += '"comments":[';
+        
         // Reads thread comments
         function scanThreadComments() {
             var pagePosts = document.getElementsByClassName("tid_post");
@@ -85,7 +87,7 @@ function startFDR(nPages) {
                 if (document.querySelector("#tid_forumPost_"+commentID+" .tid_name a") === undefined) {
                     continue;
                 }
-                var postScanDate = Date.now();
+                
                 var postAuthor = document.querySelector("#tid_forumPost_"+commentID+" .tid_name a").toString().split("/")[5];
                 var postDate = document.querySelector("#tid_forumPost_"+commentID+" .tid_date").innerHTML;
                 var res = document.querySelectorAll("#tid_forumPost_"+commentID+" .tid_editorContent");
@@ -97,10 +99,11 @@ function startFDR(nPages) {
                 commentCount++;
 
                 jsonData += commentCount == 1 ? '\n\t\t{\n\t\t\t' : ',\n\t\t{\n\t\t\t';
-                jsonData += '"scanDate":'+postScanDate+',\n\t\t\t';
                 jsonData += '"authorID":'+postAuthor+',\n\t\t\t';
                 jsonData += '"id":'+commentID+',\n\t\t\t';
-                jsonData += '"date":"'+postDate+'",\n\t\t\t';
+                jsonData += '"displayedDate":"'+postDate+'",\n\t\t\t'; // Date displayed
+                jsonData += '"loadTimestamp":'+thrCommsPageLoadTimestamp+',\n\t\t\t'; // Timestamp of when the page finished loading
+                jsonData += '"deducedDate":"'+deduceDate(postDate,thrCommsPageLoadTimestamp)+'",\n\t\t\t'; // Deduced timestamp of the comment
                 jsonData += '"content":"'+postContent+'",\n\t\t\t';
                 jsonData += '"contentWarning":' + (postWarning == undefined ? 'null' : '"'+postWarning+'"') + '\n\t\t';
                 jsonData += "}";
@@ -202,6 +205,62 @@ function switchMainDisplayToStatus() {
 function updateStatus(msg) {
     if (mainDisplay != "status" || fdrMainElement == undefined) return;
     fdrMainElement.innerHTML = msg;
+}
+
+function deduceDate(displayedDate, loadTimestamp) {
+    var loadDate = new Date(loadTimestamp+(1000*3600*2)); // at UTC+2
+    var spl = displayedDate.split(" ");
+    var sDate = "";
+
+    switch (spl[0]) {
+        case "Le":
+            sDate = (spl[3] != undefined) ? spl[3] : loadDate.getUTCFullYear();
+            switch(spl[2]) {
+                case "janvier": sDate += "-01"; break;
+                case "février": sDate += "-02"; break;
+                case "mars": sDate += "-03"; break;
+                case "avril": sDate += "-04"; break;
+                case "mai": sDate += "-05"; break;
+                case "juin": sDate += "-06"; break;
+                case "juillet": sDate += "-07"; break;
+                case "août": sDate += "-08"; break;
+                case "septembre": sDate += "-09"; break;
+                case "octobre": sDate += "-10"; break;
+                case "novembre": sDate += "-11"; break;
+                case "décembre": sDate += "-12"; break;
+                default: console.log("[ForumDataRetriever] Unknown month: '" + spl[2] + "'"); return undefined;
+            }
+            
+            sDate += "-"+spl[1];
+            break;
+        case "Lundi": case "Mardi": case "Mercredi": case "Jeudi": case "Vendredi": case "Samedi": case "Dimanche":
+            var todayDay = loadDate.getUTCDay();
+            var postDay = -1;
+            switch (spl[0]) {
+                case "Dimanche": postDay = 0; break;
+                case "Lundi": postDay = 1; break;
+                case "Mardi": postDay = 2; break;
+                case "Mercredi": postDay = 3; break;
+                case "Jeudi": postDay = 4; break;
+                case "Vendredi": postDay = 5; break;
+                case "Samedi": postDay = 6; break;
+            }
+            var diff;
+            if (todayDay == postDay) diff = 0; 
+            else if (todayDay > postDay) diff = postDay - todayDay;
+            else diff = -((todayDay+7) - postDay);
+
+            var postDate = new Date(loadDate);
+            postDate.setUTCDate((loadDate.getUTCDate()+diff));
+
+            var m = postDate.getUTCMonth()+1;
+            var sMonth = (m < 10) ? "0"+m : m;
+            sDate = postDate.getUTCFullYear()+"-"+sMonth+"-"+postDate.getUTCDate();
+            break;
+        default:
+    }
+
+    return sDate;
 }
 
 window.onload = function () {
