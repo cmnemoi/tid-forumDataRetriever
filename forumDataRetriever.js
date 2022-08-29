@@ -66,8 +66,22 @@ function startFDR(nPages) {
     function scanThread() {
         var thrCommsPageLoadTimestamp = Date.now(); // threadCommentsPageLoadTimestamp
         var commentCount = 0;
-        var topicName = document.querySelector("#tid_forum_right .tid_title").innerHTML.trim();
-        topicName = topicName.replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/\n/g,'').replace(/\t/g,'');
+
+        var thrTitle = document.querySelector("#tid_forum_right .tid_title").innerHTML.trim();
+        thrTitle = thrTitle.replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/\n/g,'').replace(/\t/g,'');
+        var minorThrTag = "null";
+        var majorThrTag = "null";
+        var reg = /<span(.*)>(.*)<\/span>/;
+        var match = thrTitle.match(reg);
+        if (match != null) {
+            if (match[1].indexOf("tid_minor") != -1) {
+                minorThrTag = '"'+match[2]+'"';
+            }
+            else {
+                majorThrTag = '"'+match[2]+'"';
+            }
+            thrTitle = thrTitle.replace(match[0]+" ",'');
+        }
 
         var thrStates = "";
         function addThrStates(state) {
@@ -81,8 +95,10 @@ function startFDR(nPages) {
         if (document.querySelector("#tid_forum_right .tid_threadNotice.tid_adminAnnounce") != undefined) addThrStates('adminAnnounce');
         if (document.querySelector("#tid_forum_right .tid_threadNotice.tid_announce") != undefined) addThrStates('announce');
         
-        jsonData += '"name":"'+topicName+'",\n\t';
+        jsonData += '"title":"'+thrTitle+'",\n\t';
         jsonData += '"id":'+threadIDs[threadPos]+',\n\t';
+        jsonData += '"minorTag":'+minorThrTag+',\n\t';
+        jsonData += '"majorTag":'+majorThrTag+',\n\t';
         jsonData += '"pages":'+forumRPageNumber+',\n\t';
         jsonData += '"states":['+thrStates+'],\n\t';
         jsonData += '"comments":[';
