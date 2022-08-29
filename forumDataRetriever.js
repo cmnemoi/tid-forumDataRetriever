@@ -107,12 +107,23 @@ function startFDR(nPages) {
                     postWarning = postWarning.replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/\u{2028}|\u{2029}/gu, '').replace(/\r\n/g,'<br />').replace(/\n/g,'\\n'); // replaces copypasted
                 commentCount++;
 
+                var commElement = document.querySelector("#tid_forumPost_"+commentID);
+                var commTags = "";
+                function addCommTag(tag) {
+                    if (commTags.length != 0) commTags += ",";
+                    commTags += '"'+tag+'"';
+                }
+                if (commElement.classList.contains("tid_hidden")) addCommTag('hidden');
+                if (commElement.classList.contains("tid_niceHidden")) addCommTag('niceHidden');
+                if (commElement.classList.contains("tid_modReplaced")) addCommTag('modReplaced');
+
                 jsonData += commentCount == 1 ? '\n\t\t{\n\t\t\t' : ',\n\t\t{\n\t\t\t';
                 jsonData += '"authorID":'+postAuthor+',\n\t\t\t';
                 jsonData += '"id":'+commentID+',\n\t\t\t';
                 jsonData += '"displayedDate":"'+postDate+'",\n\t\t\t'; // Date displayed
                 jsonData += '"loadTimestamp":'+thrCommsPageLoadTimestamp+',\n\t\t\t'; // Timestamp of when the page finished loading
                 jsonData += '"deducedDate":"'+deduceDate(postDate,thrCommsPageLoadTimestamp)+'",\n\t\t\t'; // Deduced timestamp of the comment
+                jsonData += '"tags":['+commTags+'],\n\t\t\t';
                 jsonData += '"content":"'+postContent+'",\n\t\t\t';
                 jsonData += '"contentWarning":' + (postWarning == undefined ? 'null' : '"'+postWarning+'"') + '\n\t\t';
                 jsonData += "}";
