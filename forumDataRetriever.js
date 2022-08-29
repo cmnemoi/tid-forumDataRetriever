@@ -352,5 +352,6 @@ window.onload = function () {
     <p id="fdr-main" style="margin:auto;text-align:center;"><a href="javascript:void(0)" id="fdr-a">Show ForumDataRetriever Interface</a> </p>`.trim();
     var node = template.content.firstChild;
     var e = document.getElementById("content");
+    if (e == undefined) e = document.querySelector("#gamebody .saloon"); // hordes town forums
     e.insertBefore(node,e.children[0]);
 }
