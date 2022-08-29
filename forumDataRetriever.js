@@ -69,19 +69,19 @@ function startFDR(nPages) {
         var topicName = document.querySelector("#tid_forum_right .tid_title").innerHTML.trim();
         topicName = topicName.replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/\n/g,'').replace(/\t/g,'');
 
-        var thrTags = "";
-        function addTag(tag) {
-            if (thrTags.length != 0) thrTags += ",";
-            thrTags += '"'+tag+'"';
+        var thrStates = "";
+        function addThrStates(state) {
+            if (thrStates.length != 0) thrStates += ",";
+            thrStates += '"'+state+'"';
         }
         var thrElement = document.querySelector(".tid_thread.tid_selected");
-        if (thrElement.classList.contains("tid_hidden")) addTag('hidden');
-        if (document.querySelector("#tid_forum_right .tid_threadNotice.tid_lock")) addTag('locked');
+        if (thrElement.classList.contains("tid_hidden")) addThrStates('hidden');
+        if (document.querySelector("#tid_forum_right .tid_threadNotice.tid_lock")) addThrStates('locked');
         
         jsonData += '"name":"'+topicName+'",\n\t';
         jsonData += '"id":'+threadIDs[threadPos]+',\n\t';
         jsonData += '"pages":'+forumRPageNumber+',\n\t';
-        jsonData += '"tags":['+thrTags+'],\n\t';
+        jsonData += '"states":['+thrStates+'],\n\t';
         jsonData += '"comments":[';
         
         // Reads thread comments
@@ -108,14 +108,14 @@ function startFDR(nPages) {
                 commentCount++;
 
                 var commElement = document.querySelector("#tid_forumPost_"+commentID);
-                var commTags = "";
-                function addCommTag(tag) {
-                    if (commTags.length != 0) commTags += ",";
-                    commTags += '"'+tag+'"';
+                var commStates = "";
+                function addCommStates(state) {
+                    if (commStates.length != 0) commStates += ",";
+                    commStates += '"'+state+'"';
                 }
-                if (commElement.classList.contains("tid_hidden")) addCommTag('hidden');
-                if (commElement.classList.contains("tid_niceHidden")) addCommTag('niceHidden');
-                if (commElement.classList.contains("tid_modReplaced")) addCommTag('modReplaced');
+                if (commElement.classList.contains("tid_hidden")) addCommStates('hidden');
+                if (commElement.classList.contains("tid_niceHidden")) addCommStates('niceHidden');
+                if (commElement.classList.contains("tid_modReplaced")) addCommStates('modReplaced');
 
                 jsonData += commentCount == 1 ? '\n\t\t{\n\t\t\t' : ',\n\t\t{\n\t\t\t';
                 jsonData += '"authorID":'+postAuthor+',\n\t\t\t';
@@ -123,7 +123,7 @@ function startFDR(nPages) {
                 jsonData += '"displayedDate":"'+postDate+'",\n\t\t\t'; // Date displayed
                 jsonData += '"loadTimestamp":'+thrCommsPageLoadTimestamp+',\n\t\t\t'; // Timestamp of when the page finished loading
                 jsonData += '"deducedDate":"'+deduceDate(postDate,thrCommsPageLoadTimestamp)+'",\n\t\t\t'; // Deduced timestamp of the comment
-                jsonData += '"tags":['+commTags+'],\n\t\t\t';
+                jsonData += '"states":['+commStates+'],\n\t\t\t';
                 jsonData += '"content":"'+postContent+'",\n\t\t\t';
                 jsonData += '"contentWarning":' + (postWarning == undefined ? 'null' : '"'+postWarning+'"') + '\n\t\t';
                 jsonData += "}";
