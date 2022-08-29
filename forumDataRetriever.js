@@ -66,12 +66,22 @@ function startFDR(nPages) {
     function scanThread() {
         var thrCommsPageLoadTimestamp = Date.now(); // threadCommentsPageLoadTimestamp
         var commentCount = 0;
-        var topicName = document.querySelectorAll("#tid_forum_right .tid_title")[0].innerHTML.trim();
+        var topicName = document.querySelector("#tid_forum_right .tid_title").innerHTML.trim();
         topicName = topicName.replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/\n/g,'').replace(/\t/g,'');
 
+        var thrTags = "";
+        function addTag(tag) {
+            if (thrTags.length != 0) thrTags += ",";
+            thrTags += '"'+tag+'"';
+        }
+        var thrElement = document.querySelector(".tid_thread.tid_selected");
+        if (thrElement.classList.contains("tid_hidden")) addTag('hidden');
+        if (document.querySelector("#tid_forum_right .tid_threadNotice.tid_lock")) addTag('locked');
+        
         jsonData += '"name":"'+topicName+'",\n\t';
         jsonData += '"id":'+threadIDs[threadPos]+',\n\t';
         jsonData += '"pages":'+forumRPageNumber+',\n\t';
+        jsonData += '"tags":['+thrTags+'],\n\t';
         jsonData += '"comments":[';
         
         // Reads thread comments
