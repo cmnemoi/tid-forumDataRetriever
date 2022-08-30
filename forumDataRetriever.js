@@ -332,7 +332,7 @@ function deduceDate(displayedDate, loadTimestamp) {
     return sDate;
 }
 
-window.onload = function () {
+window.addEventListener('load', function () {
     document.addEventListener('click', function (e) {
         if (e.target == document.getElementById("fdr-go")) {
             switchMainDisplayToStatus();
@@ -374,4 +374,4 @@ window.onload = function () {
     var e = document.getElementById("content");
     if (e == undefined) e = document.querySelector("#gamebody .saloon"); // hordes town forums
     e.insertBefore(node,e.children[0]);
-}
+});
