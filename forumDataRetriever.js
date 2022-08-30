@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         ForumDataRetriever
+// @name         ForumDataRetriever (master)
 // @version      3.0.0
 // @description  Retrieve twinoid forums data into JSON Format
 // @author       Sanart
