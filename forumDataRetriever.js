@@ -3,9 +3,9 @@
 // @version      3.0.0
 // @description  Retrieve twinoid forums data into JSON Format
 // @author       Sanart
-// @updateURL   https://raw.githubusercontent.com/Sanart99/tid-forumDataRetriever/master/forumDataRetriever.js
-// @downloadURL https://raw.githubusercontent.com/Sanart99/tid-forumDataRetriever/master/forumDataRetriever.js
-// @include  https://twinoid.com/tid/forum*
+// @updateURL    https://raw.githubusercontent.com/Sanart99/tid-forumDataRetriever/master/forumDataRetriever.js
+// @downloadURL  https://raw.githubusercontent.com/Sanart99/tid-forumDataRetriever/master/forumDataRetriever.js
+// @include https://twinoid.com/tid/forum*
 // @include https://twinoid.com/fr/tid/forum*
 // @include http://www.hordes.fr/tid/forum*
 // @include http://www.die2nite.com/tid/forum*
@@ -13,11 +13,9 @@
 // @include http://www.zombinoia.com/tid/forum*
 // ==/UserScript==
 
-var maxPages = undefined;
 var mainDisplay = 'askToShowInterface';
 
 function startFDR(nPages) {
-    var threadElements = undefined;
     var threadIDs = [];
     var threadPos = 0;
 
@@ -27,18 +25,17 @@ function startFDR(nPages) {
     var nPageThreadsScanned = 0;
 
     var forumRElement = document.getElementById("tid_forum_right");
-    maxPages = nPages;
 
     // Reads a page of threads
     function scanThreads() {
-        if (maxPages == undefined) maxPages = parseInt(document.getElementById("fdr-maxPages").value);
-        if (isNaN(maxPages)) { console.log("[ForumDataRetriever] maxPages is NaN."); return; }
+        if (nPages == undefined) nPages = parseInt(document.getElementById("fdr-maxPages").value);
+        if (isNaN(nPages)) { console.log("[ForumDataRetriever] maxPages is NaN."); return; }
         
         if (_tid.forum.urlLeft.indexOf("?p=") == -1) _tid.forum.loadLeft(_tid.forum.urlLeft+"?p=1");
 
-        updateStatus("Pages fetched : " + nPageThreadsScanned + " (Max : " + maxPages + ")");
+        updateStatus("Pages fetched : " + nPageThreadsScanned + " (Max : " + nPages + ")");
 
-        threadElements = document.getElementsByClassName("tid_thread tid_threadLink");
+        var threadElements = document.getElementsByClassName("tid_thread tid_threadLink");
         threadIDs = [];
         threadPos = 0;
         forumRPageNumber = 1;
@@ -167,7 +164,7 @@ function startFDR(nPages) {
                         updateStatus("Pages fetched : " + nPageThreadsScanned + ". Result is logged into console.");
                     }
 
-                    if (maxPages == nPageThreadsScanned) {
+                    if (nPages == nPageThreadsScanned) {
                         reachedEnd();
                         return;
                     }
@@ -176,9 +173,9 @@ function startFDR(nPages) {
                     var e = document.querySelectorAll("#tid_forum_left .tid_actionBar .tid_next a")[0];
                     if (e !== undefined && e.toString().split("=")[1] !== undefined) {
                         var nextThreadsPage = e.toString().split("=")[1].split("|")[0];
-                        if (maxPages == nPageThreadsScanned) 
+                        if (nPages == nPageThreadsScanned) 
 
-                        updateStatus("Pages fetched : " + nPageThreadsScanned + " (Max : " + maxPages + ")");
+                        updateStatus("Pages fetched : " + nPageThreadsScanned + " (Max : " + nPages + ")");
 
                         jsonData += '\n\t},\n\t{\n\t';
 
@@ -327,7 +324,6 @@ function deduceDate(displayedDate, loadTimestamp) {
             var sMonth = (m < 10) ? "0"+m : m;
             sDate = postDate.getUTCFullYear()+"-"+sMonth+"-"+postDate.getUTCDate();
             break;
-        default:
     }
 
     return sDate;
@@ -342,7 +338,6 @@ window.onload = function () {
         else if (e.target == document.getElementById("fdr-a") && document.getElementById("fdr-interface") == undefined) {
             addFDRInterface();
         }
-        ;
     });
 
     function addFDRInterface() {
@@ -352,7 +347,7 @@ window.onload = function () {
             <div class="tid_stack tid_bg4">
                 <span class="tid_title">ForumDataRetriever</span>
             </div>
-                
+            
             <div class="tid_actionBar tid_bg4">
                 <form>
                     <label for="fdr-maxPages" style="font-size:16px">Pages : </label>
@@ -369,8 +364,7 @@ window.onload = function () {
     }
 
     var template = document.createElement('template');
-    template.innerHTML = `
-    <p id="fdr-main" style="margin:auto;text-align:center;"><a href="javascript:void(0)" id="fdr-a">Show ForumDataRetriever Interface</a> </p>`.trim();
+    template.innerHTML = `<p id="fdr-main" style="margin:auto;text-align:center;"><a href="javascript:void(0)" id="fdr-a">Show ForumDataRetriever Interface</a> </p>`;
     var node = template.content.firstChild;
     var e = document.getElementById("content");
     if (e == undefined) e = document.querySelector("#gamebody .saloon"); // hordes town forums
