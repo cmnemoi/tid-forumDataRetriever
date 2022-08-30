@@ -27,7 +27,7 @@ function startFDR(nPages) {
 
     utcOffset = parseInt(document.getElementById("fdr-utc").value);
 
-    var jsonData = '{\n"utcOffset":'+utcOffset+',\n\t"topics": [{\n\t';
+    var jsonData = '{\n"utcOffset":'+utcOffset+',\n"topics": [{\n\t';
 
     // Reads a page of threads
     function scanThreads() {
