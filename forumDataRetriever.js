@@ -67,6 +67,9 @@ function startFDR(nPages) {
         var thrCommsPageLoadTimestamp = Date.now(); // threadCommentsPageLoadTimestamp
         var commentCount = 0;
 
+        var kubesElement = document.querySelector(".tid_likeBg");
+        var kubes = (kubesElement == null) ? 0 : parseInt(kubesElement.innerText);
+
         var thrTitle = document.querySelector("#tid_forum_right .tid_title").innerHTML.trim();
         thrTitle = thrTitle.replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/\n/g,'').replace(/\t/g,'');
         var minorThrTag = "null";
@@ -99,6 +102,7 @@ function startFDR(nPages) {
         jsonData += '"id":'+threadIDs[threadPos]+',\n\t';
         jsonData += '"minorTag":'+minorThrTag+',\n\t';
         jsonData += '"majorTag":'+majorThrTag+',\n\t';
+        jsonData += '"kubes":'+kubes+',\n\t';
         jsonData += '"pages":'+forumRPageNumber+',\n\t';
         jsonData += '"states":['+thrStates+'],\n\t';
         jsonData += '"comments":[';
