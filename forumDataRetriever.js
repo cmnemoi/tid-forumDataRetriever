@@ -14,17 +14,20 @@
 // ==/UserScript==
 
 var mainDisplay = 'askToShowInterface';
+var utcOffset = 0;
 
 function startFDR(nPages) {
     var threadIDs = [];
     var threadPos = 0;
 
-    var jsonData = '{\n"topics": [{\n\t';
-
     var forumRPageNumber = 1;
     var nPageThreadsScanned = 0;
 
     var forumRElement = document.getElementById("tid_forum_right");
+
+    utcOffset = parseInt(document.getElementById("fdr-utc").value);
+
+    var jsonData = '{\n"utcOffset":'+utcOffset+',\n\t"topics": [{\n\t';
 
     // Reads a page of threads
     function scanThreads() {
@@ -249,7 +252,7 @@ function updateStatus(msg) {
 }
 
 function deduceDate(displayedDate, loadTimestamp) {
-    var loadDate = new Date(loadTimestamp+(1000*3600*2)); // at UTC+2
+    var loadDate = new Date(loadTimestamp+(utcOffset*1000*3600));
     var spl = displayedDate.split(" ");
     var sDate = "";
 
@@ -351,7 +354,9 @@ window.onload = function () {
             <div class="tid_actionBar tid_bg4">
                 <form>
                     <label for="fdr-maxPages" style="font-size:16px">Pages : </label>
-                    <input type="number" id="fdr-maxPages" name="fdr-maxPages" min="1" default="1" style="width:50px">
+                    <input type="number" id="fdr-maxPages" name="fdr-maxPages" min="1" value="1" style="width:50px"><br/>
+                    <label for="fdr-utc" style="font-size:16px">Server is UTC(+/-) : </label>
+                    <input type="number" id="fdr-utc" name="fdr-utc" min="-12" max="14" value="1" style="width:30px">
                 </form>
                 <div class="tid_buttonBar">
                     <a href="javascript:void(0)" id="fdr-go">Go</a>
