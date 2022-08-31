@@ -196,6 +196,9 @@ function startFDR(nPages) {
                         }).observe(document.getElementById("tid_forum_left"), { childList: true });
 
                         _tid.forum.loadLeft(_tid.forum.urlLeft.split("?")[0]+"?p="+nextThreadsPage);
+                    } else {
+                        reachedEnd();
+                        return;
                     }
                 } else {
                     // scanThread starts when next thread loads
