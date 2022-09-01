@@ -103,7 +103,6 @@ function startFDR(nPages) {
         jsonData += '"minorTag":'+minorThrTag+',\n\t';
         jsonData += '"majorTag":'+majorThrTag+',\n\t';
         jsonData += '"kubes":'+kubes+',\n\t';
-        jsonData += '"pages":'+forumRPageNumber+',\n\t';
         jsonData += '"states":['+thrStates+'],\n\t';
         jsonData += '"comments":[';
         
@@ -155,7 +154,8 @@ function startFDR(nPages) {
 
             if (isNaN(nextCommentsPage)) {
                 jsonData += '],\n\t';
-                jsonData += '"commentsCount":'+commentCount;
+                jsonData += '"commentsCount":'+commentCount+',\n\t';
+                jsonData += '"pages":'+forumRPageNumber;
                 forumRPageNumber = 1;
 
                 // if on last thread of thread page
