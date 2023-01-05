@@ -86,24 +86,20 @@ function startFDR(nPages) {
             thrTitle = thrTitle.replace(match[0]+" ",'');
         }
 
-        var thrStates = "";
-        function addThrStates(state) {
-            if (thrStates.length != 0) thrStates += ",";
-            thrStates += '"'+state+'"';
-        }
+        var thrStates = [];
         var thrElement = document.querySelector(".tid_thread.tid_selected");
-        if (thrElement.classList.contains("tid_hidden")) addThrStates('hidden');
-        if (document.querySelector("#tid_forum_right .tid_threadNotice.tid_lock") != undefined) addThrStates('locked');
-        if (document.querySelector("#tid_forum_right .tid_threadNotice.tid_niceLock") != undefined) addThrStates('niceLocked');
-        if (document.querySelector("#tid_forum_right .tid_threadNotice.tid_adminAnnounce") != undefined) addThrStates('adminAnnounce');
-        if (document.querySelector("#tid_forum_right .tid_threadNotice.tid_announce") != undefined) addThrStates('announce');
+        if (thrElement.classList.contains("tid_hidden")) thrStates.push('hidden');
+        if (document.querySelector("#tid_forum_right .tid_threadNotice.tid_lock") != undefined) thrStates.push("locked");
+        if (document.querySelector("#tid_forum_right .tid_threadNotice.tid_niceLock") != undefined) thrStates.push("niceLocked");
+        if (document.querySelector("#tid_forum_right .tid_threadNotice.tid_adminAnnounce") != undefined) thrStates.push("adminAnnounce");
+        if (document.querySelector("#tid_forum_right .tid_threadNotice.tid_announce") != undefined) thrStates.push("announce");
         
         jsonData += '"title":"'+thrTitle+'",\n\t';
         jsonData += '"id":'+threadIDs[threadPos]+',\n\t';
         jsonData += '"minorTag":'+minorThrTag+',\n\t';
         jsonData += '"majorTag":'+majorThrTag+',\n\t';
         jsonData += '"kubes":'+kubes+',\n\t';
-        jsonData += '"states":['+thrStates+'],\n\t';
+        jsonData += '"states":' + (thrStates.length > 0 ? `[${thrStates.join(",")}]'` : "null") + ",\n\t";
         jsonData += '"comments":[';
         
         // Reads thread comments
@@ -130,14 +126,10 @@ function startFDR(nPages) {
                 commentCount++;
 
                 var commElement = document.querySelector("#tid_forumPost_"+commentID);
-                var commStates = "";
-                function addCommStates(state) {
-                    if (commStates.length != 0) commStates += ",";
-                    commStates += '"'+state+'"';
-                }
-                if (commElement.classList.contains("tid_hidden")) addCommStates('hidden');
-                if (commElement.classList.contains("tid_niceHidden")) addCommStates('niceHidden');
-                if (commElement.classList.contains("tid_modReplaced")) addCommStates('modReplaced');
+                var commStates = [];
+                if (commElement.classList.contains("tid_hidden")) commStates.push("hidden");
+                if (commElement.classList.contains("tid_niceHidden")) commStates.push("niceHidden");
+                if (commElement.classList.contains("tid_modReplaced")) commStates.push("modReplaced");
 
                 jsonData += commentCount == 1 ? '\n\t\t{\n\t\t\t' : ',\n\t\t{\n\t\t\t';
                 jsonData += '"authorID":'+postAuthor+',\n\t\t\t';
@@ -145,7 +137,7 @@ function startFDR(nPages) {
                 jsonData += '"displayedDate":"'+postDate+'",\n\t\t\t'; // Date displayed
                 jsonData += '"loadTimestamp":'+thrCommsPageLoadTimestamp+',\n\t\t\t'; // Timestamp of when the page finished loading
                 jsonData += '"deducedDate":"'+deduceDate(postDate,thrCommsPageLoadTimestamp)+'",\n\t\t\t'; // Deduced timestamp of the comment
-                jsonData += '"states":['+commStates+'],\n\t\t\t';
+                jsonData += '"states":' + (commStates.length > 0 ? `[${commStates.join(",")}]'` : "null") + ",\n\t\t\t";
                 jsonData += '"content":"'+postContent+'",\n\t\t\t';
                 jsonData += '"contentWarning":' + (postWarning == undefined ? 'null' : '"'+postWarning+'"') + '\n\t\t';
                 jsonData += "}";
