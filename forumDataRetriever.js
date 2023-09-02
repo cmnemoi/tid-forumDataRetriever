@@ -99,7 +99,7 @@ function startFDR(nPages) {
         jsonData += '"minorTag":'+minorThrTag+',\n\t';
         jsonData += '"majorTag":'+majorThrTag+',\n\t';
         jsonData += '"kubes":'+kubes+',\n\t';
-        jsonData += '"states":' + (thrStates.length > 0 ? `[${thrStates.join(",")}]'` : "null") + ",\n\t";
+        jsonData += '"states":' + (thrStates.length > 0 ? `["${thrStates.join('","')}"]'` : "null") + ",\n\t";
         jsonData += '"comments":[';
         
         // Reads thread comments
@@ -137,7 +137,7 @@ function startFDR(nPages) {
                 jsonData += '"displayedDate":"'+postDate+'",\n\t\t\t'; // Date displayed
                 jsonData += '"loadTimestamp":'+thrCommsPageLoadTimestamp+',\n\t\t\t'; // Timestamp of when the page finished loading
                 jsonData += '"deducedDate":"'+deduceDate(postDate,thrCommsPageLoadTimestamp)+'",\n\t\t\t'; // Deduced timestamp of the comment
-                jsonData += '"states":' + (commStates.length > 0 ? `[${commStates.join(",")}]'` : "null") + ",\n\t\t\t";
+                jsonData += '"states":' + (commStates.length > 0 ? `["${commStates.join('","')}"]` : "null") + ",\n\t\t\t";
                 jsonData += '"content":"'+postContent+'",\n\t\t\t';
                 jsonData += '"contentWarning":' + (postWarning == undefined ? 'null' : '"'+postWarning+'"') + '\n\t\t';
                 jsonData += "}";
