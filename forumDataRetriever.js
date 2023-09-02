@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         ForumDataRetriever (master)
-// @version      4.0.0
+// @version      4.0.1
 // @description  Retrieve twinoid forums data into JSON Format
 // @author       Sanart
 // @updateURL    https://raw.githubusercontent.com/Sanart99/tid-forumDataRetriever/master/forumDataRetriever.js
@@ -99,7 +99,7 @@ function startFDR(nPages) {
         jsonData += '"minorTag":'+minorThrTag+',\n\t';
         jsonData += '"majorTag":'+majorThrTag+',\n\t';
         jsonData += '"kubes":'+kubes+',\n\t';
-        jsonData += '"states":' + (thrStates.length > 0 ? `["${thrStates.join('","')}"]'` : "null") + ",\n\t";
+        jsonData += '"states":' + (thrStates.length > 0 ? `["${thrStates.join('","')}"]` : "null") + ",\n\t";
         jsonData += '"comments":[';
         
         // Reads thread comments
