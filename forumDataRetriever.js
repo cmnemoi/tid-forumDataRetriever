@@ -120,9 +120,9 @@ function startFDR(nPages) {
                 var res = document.querySelectorAll("#tid_forumPost_"+commentID+" .tid_editorContent");
                 var postContent = res[0].innerHTML;
                 var postWarning = res[1] == undefined ? undefined : res[1].innerHTML;
-                postContent = postContent.replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/\u{2028}|\u{2029}/gu, '').replace(/\r\n/g,'<br />').replace(/\n/g,'\\n');
+                postContent = postContent.replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/\u{2028}|\u{2029}/gu, '').replace(/\r\n/g,'\\r\\n').replace(/\n/g,'\\n').replace(/\t/g,'\\t');
                 if (postWarning != undefined)
-                    postWarning = postWarning.replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/\u{2028}|\u{2029}/gu, '').replace(/\r\n/g,'<br />').replace(/\n/g,'\\n'); // replaces copypasted
+                    postWarning = postWarning.replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/\u{2028}|\u{2029}/gu, '').replace(/\r\n/g,'\\r\\n').replace(/\n/g,'\\n').replace(/\t/g,'\\t'); // replaces copypasted
                 commentCount++;
 
                 var commElement = document.querySelector("#tid_forumPost_"+commentID);
