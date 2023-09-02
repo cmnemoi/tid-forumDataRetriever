@@ -168,8 +168,6 @@ function startFDR(nPages) {
                     var e = document.querySelectorAll("#tid_forum_left .tid_actionBar .tid_next a")[0];
                     if (e !== undefined && e.toString().split("=")[1] !== undefined) {
                         var nextThreadsPage = e.toString().split("=")[1].split("|")[0];
-                        if (nPages == nPageThreadsScanned) 
-
                         updateStatus("Pages fetched : " + nPageThreadsScanned + " (Max : " + nPages + ")");
 
                         jsonData += '\n\t},\n\t{\n\t';
