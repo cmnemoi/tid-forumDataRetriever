@@ -104,6 +104,12 @@ function startFDR(nPages) {
         
         // Reads thread comments
         function scanThreadComments() {
+            // delay if something is loading on thread (like sondages)
+            if (document.querySelector("#tid_forum_right .tid_loading") != null) {
+                setTimeout(scanThreadComments,1000);
+                return;
+            }
+
             var pagePosts = document.getElementsByClassName("tid_post");
 
             var e = document.querySelectorAll("#tid_forum_right .tid_mainBar .tid_next a")[0];
