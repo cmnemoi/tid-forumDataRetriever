@@ -171,9 +171,9 @@ function startFDR(nPages) {
                     }
 
                     // if next thread page exists
-                    var e = document.querySelectorAll("#tid_forum_left .tid_actionBar .tid_next a")[0];
-                    if (e !== undefined && e.toString().split("=")[1] !== undefined) {
-                        var nextThreadsPage = e.toString().split("=")[1].split("|")[0];
+                    var ee = document.querySelectorAll("#tid_forum_left .tid_actionBar .tid_next a")[0];
+                    if (ee !== undefined && ee.toString().split("=")[1] !== undefined) {
+                        var nextThreadsPage = ee.toString().split("=")[1].split("|")[0];
                         updateStatus("Pages fetched : " + nPageThreadsScanned + " (Max : " + nPages + ")");
 
                         jsonData += '\n\t},\n\t{\n\t';
@@ -300,31 +300,31 @@ function deduceDate(displayedDate, loadTimestamp) {
             sDate = postDate.getUTCFullYear()+"-"+sMonth+"-"+postDate.getUTCDate();
             break;
         case "Hier":
-            var postDate = new Date(loadDate);
-            postDate.setUTCDate(loadDate.getUTCDate()-1);
-            var m = postDate.getUTCMonth()+1;
-            var sMonth = (m < 10) ? "0"+m : m;
-            sDate = postDate.getUTCFullYear()+"-"+sMonth+"-"+postDate.getUTCDate();
+            var postDate2 = new Date(loadDate);
+            postDate2.setUTCDate(loadDate.getUTCDate()-1);
+            var m2 = postDate2.getUTCMonth()+1;
+            var sMonth2 = (m2 < 10) ? "0"+m2 : m2;
+            sDate = postDate2.getUTCFullYear()+"-"+sMonth2+"-"+postDate2.getUTCDate();
             break;
         case "Aujourd'hui":
-            var postDate = new Date(loadDate);
-            var m = postDate.getUTCMonth()+1;
-            var sMonth = (m < 10) ? "0"+m : m;
-            sDate = postDate.getUTCFullYear()+"-"+sMonth+"-"+postDate.getUTCDate();
+            var postDate3 = new Date(loadDate);
+            var m3 = postDate3.getUTCMonth()+1;
+            var sMonth3 = (m3 < 10) ? "0"+m3 : m3;
+            sDate = postDate3.getUTCFullYear()+"-"+sMonth3+"-"+postDate3.getUTCDate();
             break;
         case "Il":
-            var postDate = new Date(loadDate);
+            var postDate4 = new Date(loadDate);
             switch (spl.length) {
-                case 5: postDate.setUTCMinutes(postDate.getUTCMinutes()-parseInt(spl[3])); break;
+                case 5: postDate4.setUTCMinutes(postDate4.getUTCMinutes()-parseInt(spl[3])); break;
                 case 7:
-                    postDate.setUTCHours(postDate.getUTCHours()-parseInt(spl[3]));
-                    postDate.setUTCMinutes(postDate.getUTCMinutes()-parseInt(spl[5]));
+                    postDate4.setUTCHours(postDate4.getUTCHours()-parseInt(spl[3]));
+                    postDate4.setUTCMinutes(postDate4.getUTCMinutes()-parseInt(spl[5]));
                     break;
                 default: console.log("[ForumDataRetriever] displayedDate parsing failed: '" + spl[2] + "'"); return "???";
             }
-            var m = postDate.getUTCMonth()+1;
-            var sMonth = (m < 10) ? "0"+m : m;
-            sDate = postDate.getUTCFullYear()+"-"+sMonth+"-"+postDate.getUTCDate();
+            var m4 = postDate4.getUTCMonth()+1;
+            var sMonth4 = (m4 < 10) ? "0"+m4 : m4;
+            sDate = postDate4.getUTCFullYear()+"-"+sMonth4+"-"+postDate4.getUTCDate();
             break;
     }
 
