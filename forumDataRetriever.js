@@ -1,12 +1,13 @@
 // ==UserScript==
 // @name         ForumDataRetriever (master)
-// @version      4.0.1
+// @version      4.1.0
 // @description  Retrieve twinoid forums data into JSON Format
-// @author       Sanart
+// @author       Sanart, Evian
 // @updateURL    https://raw.githubusercontent.com/Sanart99/tid-forumDataRetriever/master/forumDataRetriever.js
 // @downloadURL  https://raw.githubusercontent.com/Sanart99/tid-forumDataRetriever/master/forumDataRetriever.js
 // @include https://twinoid.com/tid/forum*
 // @include https://twinoid.com/fr/tid/forum*
+// @include http://mush.vg/tid/forum*
 // @include http://www.hordes.fr/tid/forum*
 // @include http://www.die2nite.com/tid/forum*
 // @include http://www.dieverdammten.de/tid/forum*
@@ -33,7 +34,7 @@ function startFDR(nPages) {
     function scanThreads() {
         if (nPages == undefined) nPages = parseInt(document.getElementById("fdr-maxPages").value);
         if (isNaN(nPages)) { console.log("[ForumDataRetriever] maxPages is NaN."); return; }
-        
+
         if (_tid.forum.urlLeft.indexOf("?p=") == -1) _tid.forum.loadLeft(_tid.forum.urlLeft+"?p=1");
 
         updateStatus("Pages fetched : " + nPageThreadsScanned + " (Max : " + nPages + ")");
@@ -93,7 +94,7 @@ function startFDR(nPages) {
         if (document.querySelector("#tid_forum_right .tid_threadNotice.tid_niceLock") != undefined) thrStates.push("niceLocked");
         if (document.querySelector("#tid_forum_right .tid_threadNotice.tid_adminAnnounce") != undefined) thrStates.push("adminAnnounce");
         if (document.querySelector("#tid_forum_right .tid_threadNotice.tid_announce") != undefined) thrStates.push("announce");
-        
+
         jsonData += '"title":"'+thrTitle+'",\n\t';
         jsonData += '"id":'+threadIDs[threadPos]+',\n\t';
         jsonData += '"minorTag":'+minorThrTag+',\n\t';
@@ -101,7 +102,7 @@ function startFDR(nPages) {
         jsonData += '"kubes":'+kubes+',\n\t';
         jsonData += '"states":' + (thrStates.length > 0 ? `["${thrStates.join('","')}"]` : "null") + ",\n\t";
         jsonData += '"comments":[';
-        
+
         // Reads thread comments
         function scanThreadComments() {
             // delay if something is loading on thread (like sondages)
@@ -120,7 +121,7 @@ function startFDR(nPages) {
                 if (document.querySelector("#tid_forumPost_"+commentID+" .tid_name a") === undefined) {
                     continue;
                 }
-                
+
                 var postAuthor = document.querySelector("#tid_forumPost_"+commentID+" .tid_name a").toString().split("/")[5];
                 var postDate = document.querySelector("#tid_forumPost_"+commentID+" .tid_date").innerHTML;
                 var res = document.querySelectorAll("#tid_forumPost_"+commentID+" .tid_editorContent");
@@ -162,6 +163,11 @@ function startFDR(nPages) {
 
                     function reachedEnd() {
                         console.log(jsonData+'\n\t}\n]}');
+                        let download = $('<a>').attr({
+                            href: `data:text/html;charset=utf-8,${encodeURIComponent(jsonData)}`,
+                            download: `result.json`
+                        }).hide().appendTo($('body'));
+                        download[0].click();
                         updateStatus("Pages fetched : " + nPageThreadsScanned + ". Result is logged into console.");
                     }
 
@@ -273,7 +279,7 @@ function deduceDate(displayedDate, loadTimestamp) {
                 case "décembre": sDate += "-12"; break;
                 default: console.log("[ForumDataRetriever] Unknown month: '" + spl[2] + "'"); return undefined;
             }
-            
+
             sDate += "-"+spl[1];
             break;
         case "Lundi": case "Mardi": case "Mercredi": case "Jeudi": case "Vendredi": case "Samedi": case "Dimanche":
@@ -289,7 +295,7 @@ function deduceDate(displayedDate, loadTimestamp) {
                 case "Samedi": postDay = 6; break;
             }
             var diff;
-            if (todayDay == postDay) diff = 0; 
+            if (todayDay == postDay) diff = 0;
             else if (todayDay > postDay) diff = postDay - todayDay;
             else diff = -((todayDay+7) - postDay);
 
@@ -349,7 +355,7 @@ window.addEventListener('load', function () {
             <div class="tid_stack tid_bg4">
                 <span class="tid_title">ForumDataRetriever</span>
             </div>
-            
+
             <div class="tid_actionBar tid_bg4">
                 <form>
                     <label for="fdr-maxPages" style="font-size:16px">Pages : </label>
