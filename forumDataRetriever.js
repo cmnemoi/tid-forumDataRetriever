@@ -3,8 +3,8 @@
 // @version      4.1.0
 // @description  Retrieve twinoid forums data into JSON Format
 // @author       Sanart, Evian
-// @updateURL    https://raw.githubusercontent.com/Sanart99/tid-forumDataRetriever/master/forumDataRetriever.js
-// @downloadURL  https://raw.githubusercontent.com/Sanart99/tid-forumDataRetriever/master/forumDataRetriever.js
+// @updateURL    https://raw.githubusercontent.com/cmnemoi/tid-forumDataRetriever/master/forumDataRetriever.js
+// @downloadURL  https://raw.githubusercontent.com/cmnemoi/tid-forumDataRetriever/master/forumDataRetriever.js
 // @include https://twinoid.com/tid/forum*
 // @include https://twinoid.com/fr/tid/forum*
 // @include http://mush.vg/tid/forum*
